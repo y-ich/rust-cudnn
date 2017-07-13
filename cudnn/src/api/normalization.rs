@@ -48,7 +48,7 @@ impl API {
     pub fn lrn_cross_channel_backward(
         handle: cudnnHandle_t,
         norm_desc: cudnnLRNDescriptor_t,
-        mode: cudnnDivNormMode_t,
+        mode: cudnnLRNMode_t,
         alpha: *const ::libc::c_void,
         src_desc: cudnnTensorDescriptor_t,
         src_data: *const ::libc::c_void,
@@ -154,7 +154,7 @@ impl API {
     unsafe fn ffi_lrn_cross_channel_backward(
         handle: cudnnHandle_t,
         norm_desc: cudnnLRNDescriptor_t,
-        mode: cudnnDivNormMode_t,
+        mode: cudnnLRNMode_t,
         alpha: *const ::libc::c_void,
         src_desc: cudnnTensorDescriptor_t,
         src_data: *const ::libc::c_void,

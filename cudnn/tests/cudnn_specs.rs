@@ -6,7 +6,7 @@ extern crate libc;
 mod cudnn_spec {
 
     use cudnn::{Cudnn, API, TensorDescriptor, FilterDescriptor, ConvolutionDescriptor};
-    use cudnn::utils::DataType;
+    use cudnn::utils::{DataType, TensorFormat};
     use co::frameworks::Cuda;
     use co::framework::IFramework;
 
@@ -50,7 +50,7 @@ mod cudnn_spec {
     fn it_finds_correct_convolution_algorithm_forward() {
         let cudnn = Cudnn::new().unwrap();
         let src = TensorDescriptor::new(&[2, 2, 2], &[4, 2, 1], DataType::Float).unwrap();
-        let filter = FilterDescriptor::new(&[1, 1, 1], DataType::Float).unwrap();
+        let filter = FilterDescriptor::new(&[1, 1, 1], DataType::Float, TensorFormat::NCHW).unwrap();
         let conv = ConvolutionDescriptor::new(&[1, 1, 1], &[1, 1, 1], DataType::Float).unwrap();
         let dest = TensorDescriptor::new(&[2, 2, 2], &[4, 2, 1], DataType::Float).unwrap();
         match API::find_convolution_forward_algorithm(*cudnn.id_c(), *filter.id_c(), *conv.id_c(), *src.id_c(), *dest.id_c()) {
@@ -63,7 +63,7 @@ mod cudnn_spec {
     fn it_finds_correct_convolution_algorithm_backward() {
         let cudnn = Cudnn::new().unwrap();
         let src = TensorDescriptor::new(&[2, 2, 2], &[4, 2, 1], DataType::Float).unwrap();
-        let filter = FilterDescriptor::new(&[1, 1, 1], DataType::Float).unwrap();
+        let filter = FilterDescriptor::new(&[1, 1, 1], DataType::Float, TensorFormat::NCHW).unwrap();
         let conv = ConvolutionDescriptor::new(&[1, 1, 1], &[1, 1, 1], DataType::Float).unwrap();
         let dest = TensorDescriptor::new(&[2, 2, 2], &[4, 2, 1], DataType::Float).unwrap();
         match API::find_convolution_backward_data_algorithm(*cudnn.id_c(), *filter.id_c(), *conv.id_c(), *src.id_c(), *dest.id_c()) {

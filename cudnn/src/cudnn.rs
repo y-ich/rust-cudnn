@@ -22,6 +22,18 @@ impl Drop for Cudnn {
     }
 }
 
+fn get_activation_descriptor(mode: cudnnActivationMode_t) -> cudnnActivationDescriptor_t {
+    let mut desc = cudnnActivationStruct::new();
+    unsafe {
+        cudnnSetActivationDescriptor(
+        &mut desc,
+        mode,
+        cudnnNanPropagation_t::CUDNN_NOT_PROPAGATE_NAN,
+        0.0);
+    }
+    &mut desc
+}
+
 impl Cudnn {
     /// Initializes a new CUDA cuDNN context.
     ///
@@ -110,9 +122,10 @@ impl Cudnn {
         dest_data: *mut ::libc::c_void,
         scale: ScalParams<T>,
     ) -> Result<(), Error> {
+        let mut desc = get_activation_descriptor(cudnnActivationMode_t::CUDNN_ACTIVATION_SIGMOID);
         API::activation_forward(
             *self.id_c(),
-            cudnnActivationMode_t::CUDNN_ACTIVATION_SIGMOID,
+            desc,
             scale.a, *src_desc.id_c(), src_data,
             scale.b, *dest_desc.id_c(), dest_data
         )
@@ -133,9 +146,10 @@ impl Cudnn {
         dest_diff_data: *mut ::libc::c_void,
         scale: ScalParams<T>,
     ) -> Result<(), Error> {
+        let mut desc = get_activation_descriptor(cudnnActivationMode_t::CUDNN_ACTIVATION_SIGMOID);
         API::activation_backward(
             *self.id_c(),
-            cudnnActivationMode_t::CUDNN_ACTIVATION_SIGMOID,
+            desc,
             scale.a, *src_desc.id_c(), src_data, *src_diff_desc.id_c(), src_diff_data,
             scale.b, *dest_desc.id_c(), dest_data, *dest_diff_desc.id_c(), dest_diff_data
         )
@@ -152,9 +166,10 @@ impl Cudnn {
         dest_data: *mut ::libc::c_void,
         scale: ScalParams<T>,
     ) -> Result<(), Error> {
+        let mut desc = get_activation_descriptor(cudnnActivationMode_t::CUDNN_ACTIVATION_RELU);
         API::activation_forward(
             *self.id_c(),
-            cudnnActivationMode_t::CUDNN_ACTIVATION_RELU,
+            desc,
             scale.a, *src_desc.id_c(), src_data,
             scale.b, *dest_desc.id_c(), dest_data
         )
@@ -175,9 +190,10 @@ impl Cudnn {
         dest_diff_data: *mut ::libc::c_void,
         scale: ScalParams<T>,
     ) -> Result<(), Error> {
+        let mut desc = get_activation_descriptor(cudnnActivationMode_t::CUDNN_ACTIVATION_RELU);
         API::activation_backward(
             *self.id_c(),
-            cudnnActivationMode_t::CUDNN_ACTIVATION_RELU,
+            desc,
             scale.a, *src_desc.id_c(), src_data, *src_diff_desc.id_c(), src_diff_data,
             scale.b, *dest_desc.id_c(), dest_data, *dest_diff_desc.id_c(), dest_diff_data
         )
@@ -194,9 +210,10 @@ impl Cudnn {
         dest_data: *mut ::libc::c_void,
         scale: ScalParams<T>,
     ) -> Result<(), Error> {
+        let mut desc = get_activation_descriptor(cudnnActivationMode_t::CUDNN_ACTIVATION_TANH);
         API::activation_forward(
             *self.id_c(),
-            cudnnActivationMode_t::CUDNN_ACTIVATION_TANH,
+            desc,
             scale.a, *src_desc.id_c(), src_data,
             scale.b, *dest_desc.id_c(), dest_data
         )
@@ -217,9 +234,10 @@ impl Cudnn {
         dest_diff_data: *mut ::libc::c_void,
         scale: ScalParams<T>,
     ) -> Result<(), Error> {
+        let mut desc = get_activation_descriptor(cudnnActivationMode_t::CUDNN_ACTIVATION_TANH);
         API::activation_backward(
             *self.id_c(),
-            cudnnActivationMode_t::CUDNN_ACTIVATION_TANH,
+            desc,
             scale.a, *src_desc.id_c(), src_data, *src_diff_desc.id_c(), src_diff_data,
             scale.b, *dest_desc.id_c(), dest_data, *dest_diff_desc.id_c(), dest_diff_data
         )
@@ -398,7 +416,7 @@ impl Cudnn {
         scale: ScalParams<T>,
     ) -> Result<(), Error> {
         API::lrn_cross_channel_forward(
-            *self.id_c(), *normalization_conf.lrn_desc().id_c(), CUDNN_LRN_CROSS_CHANNEL_DIM1,
+            *self.id_c(), *normalization_conf.lrn_desc().id_c(), cudnnLRNMode_t::CUDNN_LRN_CROSS_CHANNEL_DIM1,
             scale.a, *src_desc.id_c(), src_data,
             scale.b, *dest_desc.id_c(), dest_data
         )
@@ -421,7 +439,7 @@ impl Cudnn {
         scale: ScalParams<T>,
     ) -> Result<(), Error> {
         API::lrn_cross_channel_backward(
-            *self.id_c(), *normalization_conf.lrn_desc().id_c(), CUDNN_LRN_CROSS_CHANNEL_DIM1,
+            *self.id_c(), *normalization_conf.lrn_desc().id_c(), cudnnLRNMode_t::CUDNN_LRN_CROSS_CHANNEL_DIM1,
             scale.a, *src_desc.id_c(), src_data, *src_diff_desc.id_c(), src_diff_data,
             scale.b, *dest_desc.id_c(), dest_data, *dest_diff_desc.id_c(), dest_diff_data
         )

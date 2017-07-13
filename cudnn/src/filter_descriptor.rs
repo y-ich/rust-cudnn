@@ -4,7 +4,7 @@
 //! which is needed for forward and backward convolutional operations.
 
 use super::{API, Error};
-use super::utils::DataType;
+use super::utils::{DataType, TensorFormat};
 use ffi::*;
 
 #[derive(Debug, Clone)]
@@ -22,27 +22,36 @@ impl Drop for FilterDescriptor {
 
 impl FilterDescriptor {
     /// Initializes a new CUDA cuDNN FilterDescriptor.
-    pub fn new(filter_dim: &[i32], data_type: DataType) -> Result<FilterDescriptor, Error> {
+    pub fn new(filter_dim: &[i32], data_type: DataType, format: TensorFormat) -> Result<FilterDescriptor, Error> {
         let nb_dims = filter_dim.len() as i32;
 
         let generic_filter_desc = try!(API::create_filter_descriptor());
+        let d_type;
         match data_type {
             DataType::Float => {
-                let d_type = cudnnDataType_t::CUDNN_DATA_FLOAT;
-                try!(API::set_filter_descriptor(generic_filter_desc, d_type, nb_dims, filter_dim.as_ptr()));
-                Ok(FilterDescriptor::from_c(generic_filter_desc))
+                d_type = cudnnDataType_t::CUDNN_DATA_FLOAT;
             },
             DataType::Double => {
-                let d_type = cudnnDataType_t::CUDNN_DATA_DOUBLE;
-                try!(API::set_filter_descriptor(generic_filter_desc, d_type, nb_dims, filter_dim.as_ptr()));
-                Ok(FilterDescriptor::from_c(generic_filter_desc))
+                d_type = cudnnDataType_t::CUDNN_DATA_DOUBLE;
             },
             DataType::Half => {
-                let d_type = cudnnDataType_t::CUDNN_DATA_HALF;
-                try!(API::set_filter_descriptor(generic_filter_desc, d_type, nb_dims, filter_dim.as_ptr()));
-                Ok(FilterDescriptor::from_c(generic_filter_desc))
+                d_type = cudnnDataType_t::CUDNN_DATA_HALF;
             }
         }
+        let t_format;
+        match format {
+            TensorFormat::NCHW => {
+                t_format = cudnnTensorFormat_t::CUDNN_TENSOR_NCHW;
+            },
+            TensorFormat::NHWC => {
+                t_format = cudnnTensorFormat_t::CUDNN_TENSOR_NHWC;
+            },
+            TensorFormat::NCHW_VECT_C => {
+                t_format = cudnnTensorFormat_t::CUDNN_TENSOR_NCHW_VECT_C;
+            }
+        }
+        try!(API::set_filter_descriptor(generic_filter_desc, d_type, t_format, nb_dims, filter_dim.as_ptr()));
+        Ok(FilterDescriptor::from_c(generic_filter_desc))
     }
 
     /// Initializes a new CUDA cuDNN FilterDescriptor from its C type.

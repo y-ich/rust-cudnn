@@ -14,6 +14,17 @@ pub enum DataType {
     Half,
 }
 
+#[derive(Debug, Copy, Clone)]
+/// Defines the available data types for the CUDA cuDNN data representation.
+pub enum TensorFormat {
+    /// batch size, feature maps, rows, columns
+    NCHW,
+    /// batch size, rows, columns, feature maps
+    NHWC,
+    /// batch size, feature maps, rows, columns
+    NCHW_VECT_C,
+}
+
 #[allow(missing_debug_implementations, missing_copy_implementations)]
 /// Provides a convenient interface to access cuDNN's convolution parameters,
 /// `algo` and `workspace` and `workspace_size_in_bytes`.
