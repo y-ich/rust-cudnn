@@ -5,7 +5,9 @@ it comfortably and safely in your Rust application.
 
 As cuDNN relies on CUDA to allocate memory on the GPU, you might also look into [rust-cuda][rust-cuda].
 
-rust-cudnn was developed at [Autumn][autumn] for the Rust Machine Intelligence Framework [Leaf][leaf].
+rust-cudnn was originally developed at [Autumn][autumn] for the Rust Machine Intelligence Framework [Leaf][leaf],
+and is modified with [bindgen](https://crates.io/crates/bindgen) in this fork.
+Now rust-cudnn support cuDNN v6.
 
 rust-cudnn is part of the High-Performance Computation Framework [Collenchyma][collenchyma], for the
 [Neural Network Plugin][nn]. For an easy, unified interface for NN operations, such as those provided by
@@ -28,13 +30,7 @@ For more information,
 If you're using Cargo, just add rust-cuDNN to your Cargo.toml:
 
     [dependencies]
-    cudnn = "1.3.1"
-
-If you're using [Cargo Edit][cargo-edit], you can call:
-
-    $ cargo add cudnn
-
-[cargo-edit]: https://github.com/killercup/cargo-edit
+    cudnn = { git = "https://github.com/y-ich/rust-cudnn", branch = "bindgen" }
 
 ## Example
 
